@@ -1,23 +1,21 @@
-import logo from './logo.svg';
+// import logo from './logo.svg';
+import { useRef, useState } from 'react';
 import './App.css';
 
+// import { LOCAL_API } from "./data/localAPI.js"
+// import LOCAL_API from "./data/localAPI.js"
+import LOCAL_API from "./data/localAPI.mjs"
+// import LocalAPI from "./data/localAPI.mjs"
+
+const customApiURL = LOCAL_API.getURL();
+// const customApiURL = LocalAPI.getURL();
+
 function App() {
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        Welcome to my App!
+        customApiURL: {customApiURL}
     </div>
   );
 }
