@@ -1,4 +1,4 @@
-import { WeatherHistory } from "../models/weatherModel.js";
+import { WeatherHistory } from "../models/weatherModel.js";    
 // const imgFolder = "http://localhost:3010/images/"
 
 export const getWeatherHistory = (req, res) => {
@@ -12,11 +12,11 @@ export const getWeatherHistory = (req, res) => {
 };
 
 export const addWeatherHistory = (req, res) => {
-    const { id, city } = req.body;
+    const { zip, data } = req.body;
 
     WeatherHistory.create({
-        id,
-        city,
+        zip,
+        data,
     })
         .then(() => {
             res.status(201).send({ message: "Created" })
@@ -25,3 +25,33 @@ export const addWeatherHistory = (req, res) => {
             console.log(err)
         })
 };
+
+// export const addWeatherHistory = (req, res) => {
+//     const { zip, phrase } = req.body;
+
+//     WeatherHistory.create({
+//         zip,
+//         phrase,
+//     })
+//         .then(() => {
+//             res.status(201).send({ message: "Created" })
+//         })
+//         .catch(err => {
+//             console.log(err)
+//         })
+// };
+
+// export const addWeatherHistory = (req, res) => {
+//     const { id, city } = req.body;
+
+//     WeatherHistory.create({
+//         id,
+//         city,
+//     })
+//         .then(() => {
+//             res.status(201).send({ message: "Created" })
+//         })
+//         .catch(err => {
+//             console.log(err)
+//         })
+// };

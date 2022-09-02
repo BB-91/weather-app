@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import './App.css';
 
 import LOCAL_API from "./data/localAPI.mjs"
+import sampleData from './data/sampleData.mjs';
 const customApiURL = LOCAL_API.getURL();
+
 
 function App() {
     const [weatherHistories, setWeatherHistories] = useState([]);
@@ -15,7 +17,8 @@ function App() {
     const effectRan = useRef(false);
 
     const countryCode = "US";
-    const API_KEY = "73b464eb3a7f94ef8f3283e728d7c1d0"
+    // const API_KEY = "73b464eb3a7f94ef8f3283e728d7c1d0"
+    const API_KEY = "593c0e6267ed9cc5b57ba1ba4cc85240"
 
     const getWeatherInfo = async (zipCode) => {
         const zipCodeData = await fetch(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode},${countryCode}&appid=${API_KEY}`).then(res => { return res.json(); })
@@ -78,17 +81,77 @@ function App() {
         return dateTime;
     }
 
+    const USING_SAMPLE_DATA = true
+
+    const getLocalAPIData = async () => {
+        const localData = await fetch(customApiURL).then(res => { return res.json(); })
+        console.log(`localData: `, localData)
+        return localData
+    }
+
+    
+    // const data = await fetch(customApiURL, {
+    //     method: 'POST',
+    //     headers: {
+    //       'Accept': 'application/json',
+    //       'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(newBeer),
+    // })
+
+
+
+    // export const WeatherHistory = sequelize.define("weather_histories", {
+    //     zip: {
+    //         type: Sequelize.INTEGER,
+    //         // autoIncrement: true,
+    //         allowNull: false,
+    //         primaryKey: true
+    //     },
+    //     phrase: {
+    //         type: Sequelize.STRING,
+    //     }
+    
+    // })
+
+
+    const postToLocalAPI = async (zipCode, weatherData) => {
+        const postData = {
+            "zip": zipCode,
+            "data": weatherData,
+        }
+
+        const data = await fetch(customApiURL, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify(postData)
+
+        })
+        return data
+    }
+
     useEffect( () => {
         if (!effectRan.current) {
             effectRan.current = true;
 
             const effect = async () => {
-                updateWeatherHistories();
-                const weatherInfo = await getWeatherInfo(77539);
-                console.log(`weatherInfo: `, weatherInfo);
+                if (!USING_SAMPLE_DATA) {
+                    updateWeatherHistories();
+                    const weatherInfo = await getWeatherInfo(77539);
+                    console.log(`weatherInfo: `, weatherInfo);
+    
+                    const formattedDateTimeInUTC = getFormattedDateTimeInUTC(weatherInfo.timezone, new Date());
+                    console.log(`formattedDateTimeInUTC: `, formattedDateTimeInUTC);
+                } else {
 
-                const formattedDateTimeInUTC = getFormattedDateTimeInUTC(weatherInfo.timezone, new Date());
-                console.log(`formattedDateTimeInUTC: `, formattedDateTimeInUTC);
+                    const postRes = await postToLocalAPI(77062, sampleData)
+                    console.log(`postRes: `, postRes)
+                }
+
             }
             effect();
         }

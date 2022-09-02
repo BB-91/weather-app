@@ -20,8 +20,12 @@ sequelize.sync()
     console.log(`err: `, err)
 })
 
+// app.use(bodyParser.json());
+// app.use(cors({origin: "*"}))
+app.use(cors({origin: "http://localhost:3000"}))
+
 app.use(bodyParser.json());
-app.use(cors({origin: "*"}))
+
 // app.use(cors({origin: LOCAL_API.getOrigin()}))
 // app.use('/images', express.static('images'));
 app.use(LOCAL_API.PATH, router);
