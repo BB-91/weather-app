@@ -93,18 +93,38 @@ function App() {
 
 
 
-    const updateLocalAPI = async (zipCode, localData, dataArray) => {
+    const updateLocalAPI = async (zipCode, localData, newDataObj) => {
         if (!hasHistoricData(zipCode, localData)) {
             throw new Error(`No historic data for zip '${zipCode}' in local database. Use POST instead of PATCH/UPDATE`)
         }
         
+        // validator.assertNonArrayObj(localData);
+        validator.assertArray(localData);
+        validator.assertNonArrayObj(newDataObj);
+
+
+        // if (!Array.isArray(localData)) {
+        //     console.log(`Not an array: `, localData);
+        //     throw new Error(`localDatais not an array`);
+        // }
+
+        // if (typeof newDataObj !== "object" || Array.isArray(newDataObj)) {
+        //     console.log(`Not a non-array object: `, newDataObj);
+        //     throw new Error(`newDataObj must be a non-array object`);
+        // }
+
+
+
         // try delete then post. put/patch not working at all.
+        // todo: check localData, assert that it contains a key found in the newDataObj
+
+
 
         const { isValidPatchBody, WHERE } = validator;
 
         const body = {
             [WHERE]: {"zip": zipCode},
-            "data": dataArray,
+            "data": newDataObj,
         }
 
         if (!isValidPatchBody(body)) {
@@ -139,17 +159,22 @@ function App() {
         return Boolean(historicZipCodes.includes(zipCode) || historicZipCodes.includes(String(zipCode)))
     }
 
-    const postToLocalAPI = async (zipCode, localData, postDataArray) => {
+    const postToLocalAPI = async (zipCode, localData, newDataObj) => {
         const postData = {
             "zip": zipCode,
-            "data": postDataArray,
+            "data": newDataObj,
         }
 
-        if (!localData) {throw new Error(`Didn't receive localData`)}
-        if (!postDataArray) {throw new Error(`Didn't receive postDataArray`)}
 
-        // if (!localData.length) {throw new Error(`localData array is empty`)}
-        if (!postDataArray.length) {throw new Error(`postDataArray array is empty`)}
+        // validator.assertNonArrayObj(localData);
+        validator.assertArray(localData);
+        validator.assertNonArrayObj(newDataObj);
+
+        // if (!localData) {throw new Error(`Didn't receive localData`)}
+        // if (!postDataArray) {throw new Error(`Didn't receive postDataArray`)}
+
+        // // if (!localData.length) {throw new Error(`localData array is empty`)}
+        // if (!postDataArray.length) {throw new Error(`postDataArray array is empty`)}
 
 
         const historicZipCodes = getHistoricZipCodesFromLocalData(localData);
@@ -198,6 +223,70 @@ function App() {
         // console.log(data)
         return data
     }
+
+    // const postToLocalAPI = async (zipCode, localData, postDataArray) => {
+    //     const postData = {
+    //         "zip": zipCode,
+    //         "data": postDataArray,
+    //     }
+
+
+    //     // validator.assertNonArrayObj(localData);
+    //     // validator.assertNonArrayObj(newDataObj);
+
+    //     if (!localData) {throw new Error(`Didn't receive localData`)}
+    //     if (!postDataArray) {throw new Error(`Didn't receive postDataArray`)}
+
+    //     // if (!localData.length) {throw new Error(`localData array is empty`)}
+    //     if (!postDataArray.length) {throw new Error(`postDataArray array is empty`)}
+
+
+    //     const historicZipCodes = getHistoricZipCodesFromLocalData(localData);
+    //     console.log(historicZipCodes)
+
+    //     if (hasHistoricData(zipCode, localData)) {
+    //         throw new Error(`zip '${zipCode}' already exists in local database. Use PATCH/UPDATE method instead of POST`)
+    //     }
+
+    //     // if (historicZipCodes.includes(zipCode) || historicZipCodes.includes(String(zipCode))) {
+    //     //     console.log("FOUND EXISTING ENTRY!!!!!!!!!!!!!")
+    //     //     throw new Error(`zip '${zipCode}' already exists in local database. Use PATCH/UPDATE method instead of POST`)
+    //     // }
+
+    //     const jsonStr = JSON.stringify(postData)
+    //     console.log("jsonStr: ", jsonStr)
+    //     // const jsonStrAsStr = `${jsonStr}`
+    //     // console.log("jsonStrAsStr: ", jsonStrAsStr)
+
+    //     // console.log("jsonStr === jsonStrAsStr: ", jsonStr === jsonStrAsStr)
+    //     // console.log("typeof (jsonStr):", typeof (jsonStr))
+    //     // console.log("typeof (jsonStrAsStr):", typeof (jsonStrAsStr))
+
+    //     // const dblStr = jsonStr + "_______" + jsonStr
+    //     // console.log("dblStr: ", dblStr)
+
+        
+
+
+    //     const data = await fetch(customApiURL, {
+    //         method: 'POST',
+    //         headers: {
+    //           'Accept': 'application/json',
+    //           'Content-Type': 'application/json'
+    //         },
+
+    //         body: JSON.stringify(postData) // {data: [{...}, {...}, {...}]}
+    //         // body: `${JSON.stringify(postData)}`
+    //         // body: jsonStr
+    //     })
+    //     // .then(res => res.json())
+
+    //     console.log("post res data: ", data)
+
+    //     // .then(res => res.json());
+    //     // console.log(data)
+    //     return data
+    // }
 
     const getHistoricZipCodesFromLocalData = (localData) => {
         return localData.map(obj => {
@@ -283,11 +372,13 @@ function App() {
                         console.log("historic data found. Updating.");
                         // const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, [sampleData]);
                         // const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, [TEST_NEW_OBJ]);
-                        const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, {"data": {"a": 999}});
+                        const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, {"data": {"a": 345}});
                         console.log(`updateRes: `, updateRes);
                     } else {
                         console.log("No historic data found. Posting.");
-                        const postRes = await postToLocalAPI(TEST_ZIP_CODE, localData, [sampleData]);
+                        // const postRes = await postToLocalAPI(TEST_ZIP_CODE, localData, [sampleData]);
+                        // const postRes = await postToLocalAPI(TEST_ZIP_CODE, localData, {"data": sampleData});
+                        const postRes = await postToLocalAPI(TEST_ZIP_CODE, localData, sampleData);
                         console.log(`postRes: `, postRes);
                     }
 

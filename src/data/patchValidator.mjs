@@ -1,6 +1,6 @@
 class Validator {
     constructor() {
-        this.assertObj = this.assertObj.bind(this);
+        this.assertNonArrayObj = this.assertNonArrayObj.bind(this);
 
         this.getOnlyKey = this.getOnlyKey.bind(this);
         this.getOnlyValue = this.getOnlyValue.bind(this);
@@ -21,14 +21,22 @@ class Validator {
     WHERE = "where"
     UPDATE = "<UPDATE_KEY>"
 
-    assertObj(obj) {
-        if (typeof(obj) !== "object") {
-            throw new Error(`Expected object data type. Got ${typeof(obj)}, ${obj}`)
+    assertArray(array) {
+        if (!array || typeof(array) !== "object" || !Array.isArray(array)) {
+            console.log(`Not an array: `, array);
+            throw new Error(`Expected array. Got ${typeof(array)}, ${array}`);
+        }
+    }
+
+    assertNonArrayObj(obj) {
+        if (!obj || typeof(obj) !== "object" || Array.isArray(obj)) {
+            console.log(`Not a non-array object: `, obj);
+            throw new Error(`Expected non-array object data type. Got ${typeof(obj)}, ${obj}`);
         }
     }
 
     getOnlyKey(obj) {
-        this.assertObj(obj);
+        this.assertNonArrayObj(obj);
         const keys = Object.keys(obj);
         if (keys.length !== 1) {
             console.log("obj: ", obj)
@@ -38,7 +46,7 @@ class Validator {
     }
     
     getOnlyValue(obj) {
-        this.assertObj(obj);
+        this.assertNonArrayObj(obj);
         const values = Object.values(obj);
         if (values.length !== 1) {
             console.log("obj: ", obj)
@@ -49,7 +57,7 @@ class Validator {
 
     _getPostObj(body, which) {
 
-        this.assertObj(body);
+        this.assertNonArrayObj(body);
         const keys = Object.keys(body);
         const { WHERE, UPDATE } = this;
 
