@@ -8,6 +8,7 @@ import validator from './data/patchValidator.mjs';
 const customApiURL = LOCAL_API.getURL();
 const MAX_HISTORY_SIZE = 3;
 
+
 function App() {
     const [weatherHistories, setWeatherHistories] = useState([]);
 
