@@ -4,12 +4,18 @@ import './App.css';
 import LOCAL_API from "./data/localAPI.mjs"
 import sampleData from './data/sampleData.mjs';
 import validator from './data/patchValidator.mjs';
+// import { WEATHER_HISTORY_ATTRIBUTES } from '../local-api/models/weatherModel';
+import { WEATHER_HISTORY_ATTRIBUTES } from './local-api/models/weatherModel';
+// import { WeatherHistory } from '../local-api/models/weatherModel';
+
 
 const customApiURL = LOCAL_API.getURL();
 const MAX_HISTORY_SIZE = 3;
 
 function App() {
     const [weatherHistories, setWeatherHistories] = useState([]);
+
+    console.log("WEATHER_HISTORY_ATTRIBUTES: ", WEATHER_HISTORY_ATTRIBUTES);
 
     const updateWeatherHistories = async () => {
         const _weatherHistories = await fetch(LOCAL_API.getURL()).then(res => { return res.json(); })

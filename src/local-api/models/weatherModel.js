@@ -34,6 +34,8 @@ export const WeatherHistory = sequelize.define("weather_histories", {
 
 })
 
+export const WEATHER_HISTORY_ATTRIBUTES = WeatherHistory.getAttributes();
+
 // export const WeatherHistory = sequelize.define("weather_histories", {
 //     zip: {
 //         type: Sequelize.INTEGER,

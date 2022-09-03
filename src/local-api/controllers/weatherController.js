@@ -1,7 +1,9 @@
-import { WeatherHistory } from "../models/weatherModel.js";    
+// import { WeatherHistory } from "../models/weatherModel.js";    
+import { WeatherHistory } from "../models/weatherModel.js"
 // const imgFolder = "http://localhost:3010/images/"
 
-import validator from "../../src/data/patchValidator.mjs";
+// import validator from "../../src/data/patchValidator.mjs";
+import validator from "../../data/patchValidator.mjs";
 
 export const getWeatherHistory = (req, res) => {
     WeatherHistory.findAll()

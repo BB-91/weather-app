@@ -5,7 +5,8 @@ import router from "./routes/weatherAPI.js";
 import { sequelize } from "./db/index.js";
 // import { LOCAL_API } from "../src/data/localAPI.js"
 // import LOCAL_API from "../src/data/localAPI.js"
-import LOCAL_API from "../src/data/localAPI.mjs"
+// import LOCAL_API from "../src/data/localAPI.mjs"
+import LOCAL_API from "../data/localAPI.mjs";
 // import LocalAPI from "../src/data/localAPI.mjs"
 
 const app = express();
