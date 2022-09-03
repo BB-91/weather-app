@@ -1,6 +1,20 @@
 import {Sequelize} from "sequelize";
 import { sequelize } from "../db/index.js";
 
+// {
+//     Austin: {...},
+// }
+
+
+// {
+//     Austin: {
+//         0: {...},
+//         1: {...},
+//         2: {...}
+//     }
+
+// }
+
 
 export const WeatherHistory = sequelize.define("weather_histories", {
     zip: {
@@ -9,8 +23,13 @@ export const WeatherHistory = sequelize.define("weather_histories", {
         allowNull: false,
         primaryKey: true
     },
+    // data: {
+    //     type: Sequelize.JSON,
+    // }
+
     data: {
         type: Sequelize.JSON,
+        // type: Sequelize.STRING,
     }
 
 })

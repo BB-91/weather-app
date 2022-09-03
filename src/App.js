@@ -3,8 +3,10 @@ import './App.css';
 
 import LOCAL_API from "./data/localAPI.mjs"
 import sampleData from './data/sampleData.mjs';
-const customApiURL = LOCAL_API.getURL();
+import validator from './data/patchValidator.mjs';
 
+const customApiURL = LOCAL_API.getURL();
+const MAX_HISTORY_SIZE = 3;
 
 function App() {
     const [weatherHistories, setWeatherHistories] = useState([]);
@@ -89,37 +91,93 @@ function App() {
         return localData
     }
 
-    
-    // const data = await fetch(customApiURL, {
-    //     method: 'POST',
-    //     headers: {
-    //       'Accept': 'application/json',
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(newBeer),
-    // })
 
 
+    const updateLocalAPI = async (zipCode, localData, dataArray) => {
+        if (!hasHistoricData(zipCode, localData)) {
+            throw new Error(`No historic data for zip '${zipCode}' in local database. Use POST instead of PATCH/UPDATE`)
+        }
+        
+        // try delete then post. put/patch not working at all.
 
-    // export const WeatherHistory = sequelize.define("weather_histories", {
-    //     zip: {
-    //         type: Sequelize.INTEGER,
-    //         // autoIncrement: true,
-    //         allowNull: false,
-    //         primaryKey: true
-    //     },
-    //     phrase: {
-    //         type: Sequelize.STRING,
+        const { isValidPatchBody, WHERE } = validator;
+
+        const body = {
+            [WHERE]: {"zip": zipCode},
+            "data": dataArray,
+        }
+
+        if (!isValidPatchBody(body)) {
+            throw new Error(`Invalid patch data: ${body}`)
+        }
+
+        const data = await fetch(customApiURL, {
+            method: 'PATCH',
+            // method: 'PUT',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
+        })
+        // .then(res => res.json())
+
+        console.log("update res data: ", data);
+        return data;
+    }
+
+    // const postToLocalAPI = async (zipCode, weatherData) => {
+    //     const postData = {
+    //         "zip": zipCode,
+    //         "data": weatherData,
     //     }
-    
-    // })
 
+    const hasHistoricData = (zipCode, localData) => {
+        if (isNaN(zipCode)) {throw new Error(`Not a number: ${zipCode}`)};
+        if (!localData) {throw new Error(`Didn't receive localData`)};
+        const historicZipCodes = getHistoricZipCodesFromLocalData(localData);
+        return Boolean(historicZipCodes.includes(zipCode) || historicZipCodes.includes(String(zipCode)))
+    }
 
-    const postToLocalAPI = async (zipCode, weatherData) => {
+    const postToLocalAPI = async (zipCode, localData, postDataArray) => {
         const postData = {
             "zip": zipCode,
-            "data": weatherData,
+            "data": postDataArray,
         }
+
+        if (!localData) {throw new Error(`Didn't receive localData`)}
+        if (!postDataArray) {throw new Error(`Didn't receive postDataArray`)}
+
+        // if (!localData.length) {throw new Error(`localData array is empty`)}
+        if (!postDataArray.length) {throw new Error(`postDataArray array is empty`)}
+
+
+        const historicZipCodes = getHistoricZipCodesFromLocalData(localData);
+        console.log(historicZipCodes)
+
+        if (hasHistoricData(zipCode, localData)) {
+            throw new Error(`zip '${zipCode}' already exists in local database. Use PATCH/UPDATE method instead of POST`)
+        }
+
+        // if (historicZipCodes.includes(zipCode) || historicZipCodes.includes(String(zipCode))) {
+        //     console.log("FOUND EXISTING ENTRY!!!!!!!!!!!!!")
+        //     throw new Error(`zip '${zipCode}' already exists in local database. Use PATCH/UPDATE method instead of POST`)
+        // }
+
+        const jsonStr = JSON.stringify(postData)
+        console.log("jsonStr: ", jsonStr)
+        // const jsonStrAsStr = `${jsonStr}`
+        // console.log("jsonStrAsStr: ", jsonStrAsStr)
+
+        // console.log("jsonStr === jsonStrAsStr: ", jsonStr === jsonStrAsStr)
+        // console.log("typeof (jsonStr):", typeof (jsonStr))
+        // console.log("typeof (jsonStrAsStr):", typeof (jsonStrAsStr))
+
+        // const dblStr = jsonStr + "_______" + jsonStr
+        // console.log("dblStr: ", dblStr)
+
+        
+
 
         const data = await fetch(customApiURL, {
             method: 'POST',
@@ -128,11 +186,75 @@ function App() {
               'Content-Type': 'application/json'
             },
 
-            body: JSON.stringify(postData)
-
+            body: JSON.stringify(postData) // {data: [{...}, {...}, {...}]}
+            // body: `${JSON.stringify(postData)}`
+            // body: jsonStr
         })
+        // .then(res => res.json())
+
+        console.log("post res data: ", data)
+
+        // .then(res => res.json());
+        // console.log(data)
         return data
     }
+
+    const getHistoricZipCodesFromLocalData = (localData) => {
+        return localData.map(obj => {
+            return obj.zip;
+        })
+    }
+
+    const getHistoricDataArrayFromZipCode = (localData, zipCode) => {
+        let matchingObj;
+
+        for (let i = 0; i < localData.length; i++) {
+            const obj = localData[i];
+            if (String(obj["zip"]) === String(zipCode)) {
+                matchingObj = obj;
+                break;
+            }
+        }
+
+        if (!matchingObj) {
+            return []
+        } else {
+            console.log("matchingObj: ", matchingObj);
+
+            const historicDataArray = matchingObj["data"];
+            if (!Array.isArray(historicDataArray)) {
+                throw new Error(`Not an array: `, historicDataArray);
+            }
+    
+            return historicDataArray;
+        }
+    }
+
+    // const getHistoricZipCodesFromLocalData = async (localData) => {
+    //     const historicZipCodes = []
+    //     localData.forEach(obj => {
+    //         const { zip } = obj
+    //         historicZipCodes.push(zip)
+    //     })
+    //     return historicZipCodes
+    // }
+
+    // const getHistoricZipCodesFromLocalData = async (localData) => {
+    //     const historicZipCodes = []
+    //     const localData = await getLocalAPIData()
+    //     localData.forEach(obj => {
+    //         const { zip } = obj
+    //         historicZipCodes.push(zip)
+    //     })
+    //     return historicZipCodes
+    // }
+
+    // const updateHistoricZipCode = async (localData, zipCode) => {
+    //     console.log("updating zip code: ", zipCode)
+    //     const historicZipCodes = getHistoricZipCodesFromLocalData(localData)
+    //     console.log("historicZipCodes: ", historicZipCodes)
+    // }
+
 
     useEffect( () => {
         if (!effectRan.current) {
@@ -148,8 +270,78 @@ function App() {
                     console.log(`formattedDateTimeInUTC: `, formattedDateTimeInUTC);
                 } else {
 
-                    const postRes = await postToLocalAPI(77062, sampleData)
-                    console.log(`postRes: `, postRes)
+                    // const postRes = await postToLocalAPI(77062, sampleData)
+                    // console.log(`postRes: `, postRes)
+
+                    const TEST_ZIP_CODE = 12345
+                    const TEST_NEW_OBJ = {test: "abcdefg"}
+
+                    const localData = await getLocalAPIData()
+                    console.log("localData: ", localData)
+
+                    if (hasHistoricData(TEST_ZIP_CODE, localData)) {
+                        console.log("historic data found. Updating.");
+                        // const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, [sampleData]);
+                        // const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, [TEST_NEW_OBJ]);
+                        const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, {"data": {"a": 999}});
+                        console.log(`updateRes: `, updateRes);
+                    } else {
+                        console.log("No historic data found. Posting.");
+                        const postRes = await postToLocalAPI(TEST_ZIP_CODE, localData, [sampleData]);
+                        console.log(`postRes: `, postRes);
+                    }
+
+
+                    const REFRESHED_LOCAL_DATA = await getLocalAPIData();
+                    console.log("REFRESHED_LOCAL_DATA: ", REFRESHED_LOCAL_DATA)
+
+                    // const postRes = await postToLocalAPI(TEST_ZIP_CODE, [sampleData])
+
+
+                    // const postRes = await postToLocalAPI(12345, {history: ["a", "b", "c"]})
+                    
+                    
+                    
+                    
+                    // const postRes = await postToLocalAPI(TEST_ZIP_CODE, [{a: 1}, {b:2}, {c:3}])
+                    // console.log(`postRes: `, postRes)
+
+                    // const postRes = await postToLocalAPI(90210, sampleData)
+                    // console.log(`postRes: `, postRes)
+
+                    
+
+
+
+
+                    // updateHistoricZipCode(localData, TEST_ZIP_CODE)
+
+                    // const historicZipCodes = await getHistoricZipCodes()
+                    // console.log("historicZipCodes: ", historicZipCodes)
+                    
+
+
+                    // const historicDataArray = getHistoricDataArrayFromZipCode(localData, TEST_ZIP_CODE);
+                    // console.log("historicDataArray: ", historicDataArray);
+
+                    // console.log("historicDataArray.length === MAX_HISTORY_SIZE: ", historicDataArray.length === MAX_HISTORY_SIZE);
+
+                    // let TEST_NEW_OBJ = {x:999};
+
+                    // if (historicDataArray.length === MAX_HISTORY_SIZE){
+                    //     const newDataArray = historicDataArray.slice(1).concat(TEST_NEW_OBJ)
+                    //     console.log("newDataArray: ", newDataArray)
+
+                    //     // const postRes = await postToLocalAPI(TEST_ZIP_CODE, newDataArray)
+                    //     // console.log(`postRes: `, postRes)
+
+                    //     // const updated_local_data = await getLocalAPIData();
+                    //     // console.log("updated_local_data: ", updated_local_data)
+                    // }
+
+
+
+
                 }
 
             }
