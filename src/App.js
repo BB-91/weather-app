@@ -194,13 +194,8 @@ function App() {
 
 
     const postOrPatchWeatherData = async (zipCode) => {
-        // const TEST_NEW_OBJ = {test: "abcdefg"}
         const weatherInfo = await getWeatherInfo(zipCode);
         searchedWeatherData.current = weatherInfo;
-        // weatherImgURLRef.current = weatherInfo.weatherImgURL;
-        // console.log("weatherImgURLRef.current: ", weatherImgURLRef.current)
-
-        // weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
         console.log(`weatherInfo: `, weatherInfo);
 
         const localData = await getLocalAPIData()
@@ -239,14 +234,9 @@ function App() {
 
             const effect = async () => {
 
-                // let weatherInfo;
-
-
-
                 if (!USING_SAMPLE_DATA) {
                     updateWeatherHistories();
                     const weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
-                    // weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
                     console.log(`weatherInfo: `, weatherInfo);
     
                     const formattedDateTimeInUTC = getFormattedDateTimeInUTC(weatherInfo.timezone, new Date());
@@ -254,11 +244,6 @@ function App() {
                 } else {
                     postOrPatchWeatherData(TEST_ZIP_CODE)
                 }
-
-
-
-                // const formattedDateTimeInUTC = getFormattedDateTimeInUTC(weatherInfo.timezone, new Date());
-                // console.log(`formattedDateTimeInUTC: `, formattedDateTimeInUTC);
 
             }
             // effect();
@@ -289,11 +274,7 @@ function App() {
     }
 
     const inputElement = useRef(null);
-    // let weatherImgURL = ""
-    // const searchedWeatherData = useRef({});
     const searchedWeatherData = useRef(null);
-    // const weatherImgURLRef = useRef("")
-    // const weatherImgElement = useRef(null);
 
     const handleFetchButtonClick = async () => {
         const input = inputElement.current.value;
@@ -304,30 +285,37 @@ function App() {
             const refreshed_local_data = await postOrPatchWeatherData(zipCode);
             console.log("successful post/patch")
             setWeatherHistories(refreshed_local_data)
-
-            // console.log("you pressed the fetch button");
-            // console.log("zip:", zip);
-            // const weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
-            // // weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
-            // console.log(`weatherInfo: `, weatherInfo);
         }
     }
 
-    // const handleFetchButtonClick = (event) => {
-    //     const zip = parseInt(event.target.value)
-    //     console.log("you pressed the fetch button");
-    //     console.log("zip:", zip);
+    const getTitleCaseFromSpaced = (str) => {
+        let titleCase = str.replaceAll(/ ([a-zA-Z])/g, (match, p1 ) => " " + p1.toUpperCase());
+        titleCase = titleCase.replace(/^(.)/, (match, p1 ) => p1.toUpperCase());
+        return titleCase;
+        
 
-    // }
+        // let titleCase = str.replace(/(^[a-zA-Z])(.*)/, "$1".toUpperCase() + "$2");
+        // return titleCase;
+    }
 
     const getDisplayedWeatherElements = () => {
         const data = searchedWeatherData.current;
         if (!data) {
             throw new Error(`searchedWeatherData.current not set`);
         } else {
+            // const { base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL } = data;
+            const { name, feels_like, humidity, temp, temp_max, temp_min, description, weatherImgURL } = data;
+
             return (
                 <>
-                    <img src={data.weatherImgURL} alt="weather"></img>
+                    <p>{name}</p>
+                    <img src={weatherImgURL} alt="weather"></img>
+                    <p>{getTitleCaseFromSpaced(description)}</p>
+                    <p>Curent: {temp}°</p>
+                    <p>Feels like: {feels_like}°</p>
+                    <p>Low: {temp_min}°</p>
+                    <p>High: {temp_max}°</p>
+                    <p>Humidity: {humidity}%</p>
                 </>
             )
         }
