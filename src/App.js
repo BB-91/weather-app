@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import './App.css';
+import './App.scss';
 
 import LOCAL_API from "./data/localAPI.mjs"
-import sampleData from './data/sampleData.mjs';
+// import sampleData from './data/sampleData.mjs';
 import validator from './data/patchValidator.mjs';
+
+import WeatherContainer from './containers/WeatherContainer/WeatherContainer';
+// import { getTitleCaseFromSpaced } from './data/util.mjs';
+
 
 const customApiURL = LOCAL_API.getURL();
 const MAX_HISTORY_SIZE = 3;
@@ -288,38 +292,42 @@ function App() {
         }
     }
 
-    const getTitleCaseFromSpaced = (str) => {
-        let titleCase = str.replaceAll(/ ([a-zA-Z])/g, (match, p1 ) => " " + p1.toUpperCase());
-        titleCase = titleCase.replace(/^(.)/, (match, p1 ) => p1.toUpperCase());
-        return titleCase;
+    // const getTitleCaseFromSpaced = (str) => {
+    //     let titleCase = str.replaceAll(/ ([a-zA-Z])/g, (match, p1 ) => " " + p1.toUpperCase());
+    //     titleCase = titleCase.replace(/^(.)/, (match, p1 ) => p1.toUpperCase());
+    //     return titleCase;
         
 
-        // let titleCase = str.replace(/(^[a-zA-Z])(.*)/, "$1".toUpperCase() + "$2");
-        // return titleCase;
-    }
+    //     // let titleCase = str.replace(/(^[a-zA-Z])(.*)/, "$1".toUpperCase() + "$2");
+    //     // return titleCase;
+    // }
 
-    const getDisplayedWeatherElements = () => {
-        const data = searchedWeatherData.current;
-        if (!data) {
-            throw new Error(`searchedWeatherData.current not set`);
-        } else {
-            // const { base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL } = data;
-            const { name, feels_like, humidity, temp, temp_max, temp_min, description, weatherImgURL } = data;
+    // const getDisplayedWeatherElements = () => {
+    //     const data = searchedWeatherData.current;
+    //     if (!data) {
+    //         throw new Error(`searchedWeatherData.current not set`);
+    //     } else {
+    //         // const { base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL } = data;
+    //         const { name, feels_like, humidity, temp, temp_max, temp_min, description, weatherImgURL } = data;
 
-            return (
-                <>
-                    <p>{name}</p>
-                    <img src={weatherImgURL} alt="weather"></img>
-                    <p>{getTitleCaseFromSpaced(description)}</p>
-                    <p>Curent: {temp}°</p>
-                    <p>Feels like: {feels_like}°</p>
-                    <p>Low: {temp_min}°</p>
-                    <p>High: {temp_max}°</p>
-                    <p>Humidity: {humidity}%</p>
-                </>
-            )
-        }
-    }
+    //         return (
+    //             <>
+    //                 <p>{name}</p>
+    //                 <img src={weatherImgURL} alt="weather"></img>
+    //                 <p>{getTitleCaseFromSpaced(description)}</p>
+    //                 <div className='temp-current-row'>
+    //                     <span>Curent: {temp}°</span>
+    //                     <span>( Feels like: {feels_like}° )</span>
+    //                 </div>
+    //                 <div className='temp-range-row'>
+    //                     <span>Low: {temp_min}°</span>
+    //                     <span>High: {temp_max}°</span>
+    //                 </div>
+    //                 <p>Humidity: {humidity}%</p>
+    //             </>
+    //         )
+    //     }
+    // }
 
     return (
         <div className="App">
@@ -345,9 +353,23 @@ function App() {
             <button onClick={handleFetchButtonClick}>Fetch</button>
             <br/>
 
-            {
+            <WeatherContainer data={searchedWeatherData.current}/>
+
+            {/* { searchedWeatherData.current &&
+
+
+                    getDisplayedWeatherElements()
+            }          */}
+
+
+
+            {/* {
                 searchedWeatherData.current && getDisplayedWeatherElements()
-            }
+            } */}
+
+            {/* {
+                searchedWeatherData.current && getDisplayedWeatherElements()
+            } */}
 
             {/* {
                 weatherImgURLRef.current && <img src={weatherImgURLRef.current} alt="weather"></img>

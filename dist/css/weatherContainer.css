@@ -1,0 +1,20 @@
+#weather-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+}
+
+.temp-current-row,
+.temp-range-row {
+  display: grid;
+  width: 400px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+  column-gap: 20px;
+  background-color: red;
+}
+.temp-current-row span,
+.temp-range-row span {
+  text-align: center;
+  background-color: greenyellow;
+}/*# sourceMappingURL=weatherContainer.css.map */
