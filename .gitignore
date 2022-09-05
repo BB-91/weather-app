@@ -3,6 +3,7 @@
 # dependencies
 /node_modules
 /local-api/node_modules
+/src/data/API_KEY.mjs
 /.pnp
 .pnp.js
 
