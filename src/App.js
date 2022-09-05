@@ -5,10 +5,10 @@ import LOCAL_API from "./data/localAPI.mjs"
 import sampleData from './data/sampleData.mjs';
 import validator from './data/patchValidator.mjs';
 
-
-
 const customApiURL = LOCAL_API.getURL();
 const MAX_HISTORY_SIZE = 3;
+const TEST_ZIP_CODE = 77062
+const USING_SAMPLE_DATA = true
 
 function App() {
     const [weatherHistories, setWeatherHistories] = useState([]);
@@ -83,15 +83,14 @@ function App() {
         return dateTime;
     }
 
-    const USING_SAMPLE_DATA = true
+    
+    // const USING_SAMPLE_DATA = false
 
     const getLocalAPIData = async () => {
         const localData = await fetch(customApiURL).then(res => { return res.json(); })
         console.log(`localData: `, localData)
         return localData
     }
-
-
 
     const updateLocalAPI = async (zipCode, localData, newDataObj) => {
         if (!hasHistoricData(zipCode, localData)) {
@@ -188,9 +187,50 @@ function App() {
                 console.log(`Not an array: `, historicDataArray);
                 throw new Error(`Not an array: ${historicDataArray}`);
             }
-    
+
             return historicDataArray;
         }
+    }
+
+
+    const postOrPatchWeatherData = async (zipCode) => {
+        // const TEST_NEW_OBJ = {test: "abcdefg"}
+        const weatherInfo = await getWeatherInfo(zipCode);
+        searchedWeatherData.current = weatherInfo;
+        // weatherImgURLRef.current = weatherInfo.weatherImgURL;
+        // console.log("weatherImgURLRef.current: ", weatherImgURLRef.current)
+
+        // weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
+        console.log(`weatherInfo: `, weatherInfo);
+
+        const localData = await getLocalAPIData()
+        console.log("localData: ", localData)
+
+        if (hasHistoricData(zipCode, localData)) {
+            console.log("historic data found. Updating.");
+
+            const historicDataArray = getHistoricDataArrayFromZipCode(localData, zipCode);
+            console.log("historicDataArray: ", historicDataArray);
+            console.log("historicDataArray.length === MAX_HISTORY_SIZE: ", historicDataArray.length === MAX_HISTORY_SIZE);
+
+            let newDataArray = historicDataArray.concat(weatherInfo);
+
+            if (historicDataArray.length >= MAX_HISTORY_SIZE){
+                newDataArray = newDataArray.slice(1, MAX_HISTORY_SIZE + 1);
+            }
+
+            console.log("newDataArray: ", newDataArray);
+            const updateRes = await updateLocalAPI(zipCode, localData, {"data": newDataArray});
+            console.log(`updateRes: `, updateRes);
+        } else {
+            console.log("No historic data found. Posting.");
+            const postRes = await postToLocalAPI(zipCode, localData, [weatherInfo]);
+            console.log(`postRes: `, postRes);
+        }
+
+        const REFRESHED_LOCAL_DATA = await getLocalAPIData();
+        console.log("REFRESHED_LOCAL_DATA: ", REFRESHED_LOCAL_DATA)
+        return REFRESHED_LOCAL_DATA;    
     }
 
     useEffect( () => {
@@ -198,49 +238,31 @@ function App() {
             effectRan.current = true;
 
             const effect = async () => {
+
+                // let weatherInfo;
+
+
+
                 if (!USING_SAMPLE_DATA) {
                     updateWeatherHistories();
-                    const weatherInfo = await getWeatherInfo(77539);
+                    const weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
+                    // weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
                     console.log(`weatherInfo: `, weatherInfo);
     
                     const formattedDateTimeInUTC = getFormattedDateTimeInUTC(weatherInfo.timezone, new Date());
                     console.log(`formattedDateTimeInUTC: `, formattedDateTimeInUTC);
                 } else {
-
-                    const TEST_ZIP_CODE = 12345
-                    const TEST_NEW_OBJ = {test: "abcdefg"}
-
-                    const localData = await getLocalAPIData()
-                    console.log("localData: ", localData)
-
-                    if (hasHistoricData(TEST_ZIP_CODE, localData)) {
-                        console.log("historic data found. Updating.");
-
-                        const historicDataArray = getHistoricDataArrayFromZipCode(localData, TEST_ZIP_CODE);
-                        console.log("historicDataArray: ", historicDataArray);
-                        console.log("historicDataArray.length === MAX_HISTORY_SIZE: ", historicDataArray.length === MAX_HISTORY_SIZE);
-    
-                        let newDataArray = historicDataArray.concat(TEST_NEW_OBJ);
-
-                        if (historicDataArray.length >= MAX_HISTORY_SIZE){
-                            newDataArray = newDataArray.slice(1, MAX_HISTORY_SIZE + 1);
-                        }
-
-                        console.log("newDataArray: ", newDataArray);
-                        const updateRes = await updateLocalAPI(TEST_ZIP_CODE, localData, {"data": newDataArray});
-                        console.log(`updateRes: `, updateRes);
-                    } else {
-                        console.log("No historic data found. Posting.");
-                        const postRes = await postToLocalAPI(TEST_ZIP_CODE, localData, [sampleData]);
-                        console.log(`postRes: `, postRes);
-                    }
-
-                    const REFRESHED_LOCAL_DATA = await getLocalAPIData();
-                    console.log("REFRESHED_LOCAL_DATA: ", REFRESHED_LOCAL_DATA)
+                    postOrPatchWeatherData(TEST_ZIP_CODE)
                 }
 
+
+
+                // const formattedDateTimeInUTC = getFormattedDateTimeInUTC(weatherInfo.timezone, new Date());
+                // console.log(`formattedDateTimeInUTC: `, formattedDateTimeInUTC);
+
             }
-            effect();
+            // effect();
+            console.log(" ---- EFFECT CODE HAS BEEN TEMPORARILY DISABLED TO IMPLEMENT BUTTON CLICK INSTEAD!!! ---- ")
         }
 
     }, [])
@@ -266,6 +288,51 @@ function App() {
         element.value = val.slice(0, 5);
     }
 
+    const inputElement = useRef(null);
+    // let weatherImgURL = ""
+    // const searchedWeatherData = useRef({});
+    const searchedWeatherData = useRef(null);
+    // const weatherImgURLRef = useRef("")
+    // const weatherImgElement = useRef(null);
+
+    const handleFetchButtonClick = async () => {
+        const input = inputElement.current.value;
+        if (input.length !== 5) {
+            alert("Please enter a 5-digit zip code")
+        } else {
+            const zipCode = parseInt(input);
+            const refreshed_local_data = await postOrPatchWeatherData(zipCode);
+            console.log("successful post/patch")
+            setWeatherHistories(refreshed_local_data)
+
+            // console.log("you pressed the fetch button");
+            // console.log("zip:", zip);
+            // const weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
+            // // weatherInfo = await getWeatherInfo(TEST_ZIP_CODE);
+            // console.log(`weatherInfo: `, weatherInfo);
+        }
+    }
+
+    // const handleFetchButtonClick = (event) => {
+    //     const zip = parseInt(event.target.value)
+    //     console.log("you pressed the fetch button");
+    //     console.log("zip:", zip);
+
+    // }
+
+    const getDisplayedWeatherElements = () => {
+        const data = searchedWeatherData.current;
+        if (!data) {
+            throw new Error(`searchedWeatherData.current not set`);
+        } else {
+            return (
+                <>
+                    <img src={data.weatherImgURL} alt="weather"></img>
+                </>
+            )
+        }
+    }
+
     return (
         <div className="App">
             Welcome to my App!
@@ -275,13 +342,29 @@ function App() {
             getWeatherHistoryIDs: {getWeatherHistoryIDs()}
             <br/>
             getWeatherHistoryCities: {getWeatherHistoryCities()}
+            <br/>
 
-            <input type={"number"}
-                        name="zip-code"
-                        id="zip-code"
-                        placeholder="Enter your zip code"
-                        onInput={handleInput}
+            <input 
+                    ref={inputElement}
+                    type={"number"}
+                    name="zip-code"
+                    id="zip-code"
+                    placeholder="Enter your zip code"
+                    onInput={handleInput}
                 />
+
+
+            <button onClick={handleFetchButtonClick}>Fetch</button>
+            <br/>
+
+            {
+                searchedWeatherData.current && getDisplayedWeatherElements()
+            }
+
+            {/* {
+                weatherImgURLRef.current && <img src={weatherImgURLRef.current} alt="weather"></img>
+            } */}
+
         </div>
     );
 }
