@@ -8,6 +8,10 @@
   padding-bottom: 10px;
 }
 
+img {
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.7));
+}
+
 .temp-current-row,
 .temp-range-row {
   display: grid;

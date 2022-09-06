@@ -2,11 +2,20 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    // background-color: rgb(42, 42, 42);
-    // color: white;
 }
 
 
-// .App {
-//   text-align: center;
-// }
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    justify-content: center;
+    align-content: center;
+
+    justify-items: center;
+    align-items: center;
+}
+
+#search-row {
+    margin: 20px 0;
+}

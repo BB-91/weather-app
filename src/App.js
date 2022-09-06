@@ -6,6 +6,7 @@ import validator from './data/patchValidator.mjs';
 
 import WeatherContainer from './containers/WeatherContainer/WeatherContainer';
 import HistoricWeatherContainer from './containers/HistoricWeatherContainer/HistoricWeatherContainer';
+import Wrapper from './containers/Wrapper/Wrapper';
 
 
 const customApiURL = LOCAL_API.getURL();
@@ -215,6 +216,8 @@ function App() {
                 newDataArray = newDataArray.slice(1, MAX_HISTORY_SIZE + 1);
             }
 
+            historicDataRef.current = newDataArray;
+
             console.log("newDataArray: ", newDataArray);
             const updateRes = await updateLocalAPI(zipCode, localData, {"data": newDataArray});
             console.log(`updateRes: `, updateRes);
@@ -268,21 +271,30 @@ function App() {
 
     return (
         <div className="App">
-            <input 
-                    ref={inputElement}
-                    type={"number"}
-                    name="zip-code"
-                    id="zip-code"
-                    placeholder="Enter your zip code"
-                    onInput={handleInput}
-                />
+
+            {/* <br/> */}
+
+            <div className='wrapper'>
+
+                <div id="search-row">
+                    <input onInput={handleInput} ref={inputElement} type={"number"} name="zip-code" id="zip-code" placeholder="Enter your zip code" />
+                    <button onClick={handleFetchButtonClick}>Fetch</button>
+                </div>
 
 
-            <button onClick={handleFetchButtonClick}>Fetch</button>
-            <br/>
+                { searchedWeatherData.current && <WeatherContainer data={searchedWeatherData.current}/> }
+                { historicDataRef.current.length > 0 && 
+                    <>
+                        
+                        <HistoricWeatherContainer historicDataArray={historicDataRef.current}/>
+                    </>
+                }
 
-            { searchedWeatherData.current && <WeatherContainer data={searchedWeatherData.current}/> }
-            { historicDataRef.current.length > 0 && <HistoricWeatherContainer data={historicDataRef.current}/> }
+
+            </div>
+
+     
+
 
 
 

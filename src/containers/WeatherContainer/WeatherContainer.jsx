@@ -18,6 +18,7 @@ const getDisplayedWeatherElements = (props) => {
                 <img src={weatherImgURL} alt="weather"></img>
                 <p>{name}</p>
                 <p>{getTitleCaseFromSpaced(description)}</p>
+                <p>Humidity: {humidity}%</p>
                 <span>{time}</span>
                 <div className='temp-current-row'>
                     <span>Curent: {temp}°</span>
@@ -27,7 +28,7 @@ const getDisplayedWeatherElements = (props) => {
                     <span>( Feels like: {feels_like}° )</span>
                     <span>High: {temp_max}°</span>
                 </div>
-                <p>Humidity: {humidity}%</p>
+                
             </>
         )
     }
