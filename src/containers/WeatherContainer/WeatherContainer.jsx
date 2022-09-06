@@ -12,13 +12,13 @@ const getDisplayedWeatherElements = (props) => {
         )
     } else {
         // const { base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL } = data;
-        const { name, feels_like, humidity, temp, temp_max, temp_min, description, weatherImgURL } = data;
-
+        const { name, time, feels_like, humidity, temp, temp_max, temp_min, description, weatherImgURL } = data;
         return (
             <>
-                <p>{name}</p>
                 <img src={weatherImgURL} alt="weather"></img>
+                <p>{name}</p>
                 <p>{getTitleCaseFromSpaced(description)}</p>
+                <span>{time}</span>
                 <div className='temp-current-row'>
                     <span>Curent: {temp}°</span>
                     <span>Low: {temp_min}°</span>

@@ -5,6 +5,7 @@ import LOCAL_API from "./data/localAPI.mjs"
 import validator from './data/patchValidator.mjs';
 
 import WeatherContainer from './containers/WeatherContainer/WeatherContainer';
+import HistoricWeatherContainer from './containers/HistoricWeatherContainer/HistoricWeatherContainer';
 
 
 const customApiURL = LOCAL_API.getURL();
@@ -46,8 +47,11 @@ function App() {
                 const { feels_like, humidity, pressure, temp, temp_max, temp_min } = main;
                 const { description, icon, id } = weather[0];
 
+                const time = getFormattedDateTimeInUTC(timezone, new Date());
+
                 const weatherImgURL = `https://openweathermap.org/img/wn/${icon}@2x.png`;
-                return {base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL}
+                // return {base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL}
+                return {base, clouds, coord, name, timezone, time, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL}
             }
         }
 
@@ -248,6 +252,7 @@ function App() {
 
     const inputElement = useRef(null);
     const searchedWeatherData = useRef(null);
+    const historicDataRef = useRef([]);
 
     const handleFetchButtonClick = async () => {
         const input = inputElement.current.value;
@@ -263,15 +268,6 @@ function App() {
 
     return (
         <div className="App">
-            Welcome to my App!
-            <br/>
-            customApiURL: {customApiURL}
-            <br/>
-            getWeatherHistoryIDs: {getWeatherHistoryIDs()}
-            <br/>
-            getWeatherHistoryCities: {getWeatherHistoryCities()}
-            <br/>
-
             <input 
                     ref={inputElement}
                     type={"number"}
@@ -285,7 +281,10 @@ function App() {
             <button onClick={handleFetchButtonClick}>Fetch</button>
             <br/>
 
-            <WeatherContainer data={searchedWeatherData.current}/>
+            { searchedWeatherData.current && <WeatherContainer data={searchedWeatherData.current}/> }
+            { historicDataRef.current.length > 0 && <HistoricWeatherContainer data={historicDataRef.current}/> }
+
+
 
         </div>
     );
