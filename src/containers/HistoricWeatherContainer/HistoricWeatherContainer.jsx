@@ -13,8 +13,6 @@ const HistoricWeatherContainer = (props) => {
         return historicContainers;
     }
 
-    // console.log("HistoricWeatherContainer -> historicDataArray: ", historicDataArray)
-
     return (
         <div id="historic-weather-container">
             <h3>Historic data for this zip code:</h3>

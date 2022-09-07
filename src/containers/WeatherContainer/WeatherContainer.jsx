@@ -4,14 +4,12 @@ import { getTitleCaseFromSpaced } from '../../data/util.mjs';
 
 
 const getDisplayedWeatherElements = (props) => {
-    // const data = searchedWeatherData.current;
     const { data } = props;
     if (!data) {
         return (
             <></>
         )
     } else {
-        // const { base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL } = data;
         const { name, time, feels_like, humidity, temp, temp_max, temp_min, description, weatherImgURL } = data;
         return (
             <>

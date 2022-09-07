@@ -6,7 +6,7 @@ import validator from './data/patchValidator.mjs';
 
 import WeatherContainer from './containers/WeatherContainer/WeatherContainer';
 import HistoricWeatherContainer from './containers/HistoricWeatherContainer/HistoricWeatherContainer';
-import Wrapper from './containers/Wrapper/Wrapper';
+import API_KEY from './data/API_KEY.mjs';
 
 
 const customApiURL = LOCAL_API.getURL();
@@ -15,14 +15,7 @@ const MAX_HISTORY_SIZE = 3;
 function App() {
     const [weatherHistories, setWeatherHistories] = useState([]);
 
-    const updateWeatherHistories = async () => {
-        const _weatherHistories = await fetch(LOCAL_API.getURL()).then(res => { return res.json(); })
-        setWeatherHistories(_weatherHistories);
-    }
-
-    const effectRan = useRef(false);
     const countryCode = "US";
-    const API_KEY = "593c0e6267ed9cc5b57ba1ba4cc85240"
 
     const getWeatherInfo = async (zipCode) => {
         const zipCodeData = await fetch(`http://api.openweathermap.org/geo/1.0/zip?zip=${zipCode},${countryCode}&appid=${API_KEY}`).then(res => { return res.json(); })
@@ -30,9 +23,8 @@ function App() {
         const zipCodeErrorMessage = zipCodeData.message;
 
         if (zipCodeErrorMessage) {
-            console.log("Invalid zip code: ", zipCode);
+            alert("Invalid zip code: ", zipCode);
         } else {
-            console.log("valid zip code: ", zipCode);
             const { lat, lon } = zipCodeData;
 
             const weatherData = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=imperial`).then(res => { return res.json(); })
@@ -51,7 +43,6 @@ function App() {
                 const time = getFormattedDateTimeInUTC(timezone, new Date());
 
                 const weatherImgURL = `https://openweathermap.org/img/wn/${icon}@2x.png`;
-                // return {base, clouds, coord, name, timezone, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL}
                 return {base, clouds, coord, name, timezone, time, visibility, wind, feels_like, humidity, pressure, temp, temp_max, temp_min, description, id, weatherImgURL}
             }
         }
@@ -198,7 +189,6 @@ function App() {
     const postOrPatchWeatherData = async (zipCode) => {
         const weatherInfo = await getWeatherInfo(zipCode);
         searchedWeatherData.current = weatherInfo;
-        console.log(`weatherInfo: `, weatherInfo);
 
         const localData = await getLocalAPIData()
         console.log("localData: ", localData)
@@ -232,21 +222,6 @@ function App() {
         return REFRESHED_LOCAL_DATA;    
     }
 
-    const _getWeatherHistoryValue = (key) => {
-        return weatherHistories.map(weatherHistory => {
-            return weatherHistory[key];
-        })
-    }
-
-    const getWeatherHistoryIDs = () => {
-        return _getWeatherHistoryValue("id");
-    }
-
-    const getWeatherHistoryCities = () => {
-        return _getWeatherHistoryValue("city");
-    }
-
-
     const handleInput = (event) => {
         const element = event.target;
         const val = element.value;
@@ -271,16 +246,11 @@ function App() {
 
     return (
         <div className="App">
-
-            {/* <br/> */}
-
             <div className='wrapper'>
-
                 <div id="search-row">
                     <input onInput={handleInput} ref={inputElement} type={"number"} name="zip-code" id="zip-code" placeholder="Enter your zip code" />
                     <button onClick={handleFetchButtonClick}>Fetch</button>
                 </div>
-
 
                 { searchedWeatherData.current && <WeatherContainer data={searchedWeatherData.current}/> }
                 { historicDataRef.current.length > 0 && 
@@ -289,15 +259,7 @@ function App() {
                         <HistoricWeatherContainer historicDataArray={historicDataRef.current}/>
                     </>
                 }
-
-
             </div>
-
-     
-
-
-
-
         </div>
     );
 }

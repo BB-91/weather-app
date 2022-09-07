@@ -7,14 +7,7 @@
 
     width: 450px;
 
-    // justify-content: center;
-    // align-content: center;
-
-    // align-items: center;
     justify-items: center;
-
-    // text-align: center;
-
     padding-bottom: 10px;
 
 }
@@ -29,17 +22,10 @@ img {
     width: 90%;
 
     grid-template-columns: 1fr 1fr;
-    // grid-template-columns: 500px, 500px;
-    // grid-template-columns: repeat(2, 1fr);
     grid-template-rows: auto;
     column-gap: 20px;
-    // background-color: red;
 
     span {
         text-align: center;
-        // width: 150px;
-        // width: auto;
-        // display: inline-block;
-        // background-color: greenyellow;
     }
 }
