@@ -1,28 +1,20 @@
 import {Sequelize} from "sequelize";
 import { sequelize } from "../db/index.js";
 
-// {
-//     Austin: {...},
-// }
-
-
-// {
-//     Austin: {
-//         0: {...},
-//         1: {...},
-//         2: {...}
-//     }
-
-// }
-
 
 export const WeatherHistory = sequelize.define("weather_histories", {
-    zip: {
-        type: Sequelize.INTEGER,
-        // autoIncrement: true,
-        allowNull: false,
-        primaryKey: true
+        zip: {
+            type: Sequelize.INTEGER,
+            // autoIncrement: true,
+            allowNull: false,
+            primaryKey: true
+        },
+
+        data: {
+            type: Sequelize.JSON,
+        },
     },
+<<<<<<< HEAD:src/local-api/models/weatherModel.js
     // data: {
     //     type: Sequelize.JSON,
     // }
@@ -66,3 +58,9 @@ export const WEATHER_HISTORY_ATTRIBUTES = WeatherHistory.getAttributes();
 //         type: Sequelize.STRING,
 //     }
 // })
+=======
+        {
+            timestamps: false
+        }
+)
+>>>>>>> bugfix:local-api/models/weatherModel.js

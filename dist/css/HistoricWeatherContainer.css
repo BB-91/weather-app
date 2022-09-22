@@ -1,0 +1,7 @@
+#historic-weather-container {
+  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 20px;
+  margin: 20px 0;
+}/*# sourceMappingURL=HistoricWeatherContainer.css.map */

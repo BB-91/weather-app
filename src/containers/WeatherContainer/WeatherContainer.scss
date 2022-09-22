@@ -1,0 +1,31 @@
+#weather-container {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    border: 2px solid black;
+    border-radius: 20px;
+
+    width: 450px;
+
+    justify-items: center;
+    padding-bottom: 10px;
+
+}
+
+img {
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.7));
+}
+
+.temp-current-row,
+.temp-range-row {
+    display: grid;
+    width: 90%;
+
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    column-gap: 20px;
+
+    span {
+        text-align: center;
+    }
+}
